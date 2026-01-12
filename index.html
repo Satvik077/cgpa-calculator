@@ -1,174 +1,640 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Advanced CGPA Calculator</title>
-  <style>
-    :root {
-      --bg: #f4f6fb;
-      --card: #ffffff;
-      --text: #222;
-      --primary: #4f46e5;
-    }
-    body.dark {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #e5e7eb;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, sans-serif;
-      padding: 20px;
-    }
-    h1 { text-align: center; }
-    .container { max-width: 900px; margin: auto; }
-    .card {
-      background: var(--card);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-    }
-    input, select, button {
-      padding: 8px;
-      margin: 5px 0;
-      width: 100%;
-    }
-    button {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button.secondary { background: #64748b; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 8px;
-      text-align: center;
-    }
-    .actions button {
-      margin: 0 3px;
-      width: auto;
-    }
-    .result {
-      font-size: 1.4rem;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeTrack Pro - Ultimate Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        /* Animated Background */
+        .bg-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+            opacity: 0.15;
+        }
+
+        .particle:nth-child(1) { width: 80px; height: 80px; background: #fff; top: 10%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 60px; height: 60px; background: #a78bfa; top: 60%; left: 80%; animation-delay: 2s; }
+        .particle:nth-child(3) { width: 100px; height: 100px; background: #fff; top: 80%; left: 20%; animation-delay: 4s; }
+        .particle:nth-child(4) { width: 50px; height: 50px; background: #c084fc; top: 30%; left: 70%; animation-delay: 6s; }
+        .particle:nth-child(5) { width: 70px; height: 70px; background: #fff; top: 50%; left: 50%; animation-delay: 8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -50px) rotate(90deg); }
+            50% { transform: translate(-30px, 30px) rotate(180deg); }
+            75% { transform: translate(40px, 40px) rotate(270deg); }
+        }
+
+        /* Glass Morphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+
+        /* 3D Card Effect */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg) scale(1.02);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animated Gradient Border */
+        .gradient-border {
+            position: relative;
+            background: white;
+            border-radius: 24px;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #667eea);
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: gradient-rotate 3s linear infinite;
+        }
+
+        @keyframes gradient-rotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Premium Button */
+        .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-premium:active {
+            transform: scale(0.98);
+        }
+
+        /* Achievement Badge */
+        .achievement {
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Progress Ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Slide Animations */
+        .slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pulse Animation */
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+
+        /* Shake Animation for Errors */
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Grade Color Classes */
+        .grade-O { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .grade-A-plus { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .grade-A { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .grade-B-plus { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .grade-B { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .grade-C { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+
+        /* Dark Mode Styles */
+        .dark-mode .glass-card {
+            background: rgba(30, 30, 46, 0.95);
+            color: #e0e0e0;
+        }
+
+        .dark-mode .text-gray-900 {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-mode .text-gray-700 {
+            color: #b0b0b0 !important;
+        }
+
+        .dark-mode .text-gray-500 {
+            color: #808080 !important;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 400px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(500px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-3d:hover {
+                transform: none;
+            }
+        }
+    </style>
 </head>
-<body><h1>Advanced CGPA Calculator</h1><div class="container">  <div class="card">
-    <h3>Add Course</h3>
-    <input id="subject" placeholder="Subject Name" />
-    <input id="credits" type="number" placeholder="Credits" />
-    <select id="grade">
-      <option value="10">O (10)</option>
-      <option value="9">A+ (9)</option>
-      <option value="8">A (8)</option>
-      <option value="7">B+ (7)</option>
-      <option value="6">B (6)</option>
-      <option value="5">C (5)</option>
-      <option value="0">F (0)</option>
-    </select>
-    <button onclick="addCourse()">Add</button>
-  </div>  <div class="card">
-    <h3>Courses</h3>
-    <table>
-      <thead>
-        <tr><th>Subject</th><th>Credits</th><th>Grade</th><th>Actions</th></tr>
-      </thead>
-      <tbody id="table"></tbody>
-    </table>
-  </div>  <div class="card result">
-    CGPA: <span id="cgpa">0.00</span><br />
-    Percentage: <span id="percent">0%</span>
-    <br /><br />
-    <button onclick="calculate()">Calculate</button>
-    <button class="secondary" onclick="clearAll()">Reset</button>
-    <button class="secondary" onclick="toggleTheme()">Toggle Dark Mode</button>
-  </div></div><script>
-let courses = JSON.parse(localStorage.getItem('courses') || '[]');
-let editIndex = null;
+<body>
 
-function render() {
-  const tbody = document.getElementById('table');
-  tbody.innerHTML = '';
-  courses.forEach((c, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${c.subject}</td>
-        <td>${c.credits}</td>
-        <td>${c.grade}</td>
-        <td class="actions">
-          <button onclick="editCourse(${i})">Edit</button>
-          <button onclick="deleteCourse(${i})">Delete</button>
-        </td>
-      </tr>`;
-  });
-  localStorage.setItem('courses', JSON.stringify(courses));
-}
+    <!-- Animated Background Particles -->
+    <div class="bg-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 
-function addCourse() {
-  const subject = document.getElementById('subject').value.trim();
-  const credits = Number(document.getElementById('credits').value);
-  const grade = Number(document.getElementById('grade').value);
+    <!-- Main Container -->
+    <div class="relative z-10">
+        
+        <!-- Premium Navigation -->
+        <nav class="glass sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                            G
+                        </div>
+                        <div>
+                            <h1 class="text-white font-bold text-lg">GradeTrack Pro</h1>
+                            <p class="text-white/70 text-xs">Ultimate Edition</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleDarkMode()" class="glass px-4 py-2 rounded-xl text-white hover:bg-white/20 transition-all tooltip" data-tooltip="Toggle Theme">
+                            <span id="themeIcon">🌙</span>
+                        </button>
+                        <button onclick="showAchievements()" class="glass px-4 py-2 rounded-xl text-white hover:bg-white/20 transition-all tooltip" data-tooltip="Achievements">
+                            🏆
+                        </button>
+                        <button onclick="exportData()" class="glass px-4 py-2 rounded-xl text-white hover:bg-white/20 transition-all tooltip" data-tooltip="Export Data">
+                            📥
+                        </button>
+                        <button onclick="clearAllData()" class="glass px-4 py-2 rounded-xl text-white hover:bg-white/20 transition-all tooltip" data-tooltip="Clear All">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-  if (!subject || !credits) return alert('Fill all fields');
+        <!-- Hero Stats Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- Motivational Quote -->
+            <div class="glass-card rounded-3xl p-6 mb-8 text-center slide-up">
+                <p class="text-lg font-medium text-gray-700 italic" id="motivationalQuote">
+                    "Success is the sum of small efforts repeated day in and day out."
+                </p>
+                <p class="text-sm text-gray-500 mt-2">— Robert Collier</p>
+            </div>
 
-  if (editIndex !== null) {
-    courses[editIndex] = { subject, credits, grade };
-    editIndex = null;
-  } else {
-    courses.push({ subject, credits, grade });
-  }
+            <!-- Premium Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- CGPA Card -->
+                <div class="glass-card rounded-3xl p-6 card-3d slide-up">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-6xl">📊</div>
+                        <div class="relative w-16 h-16">
+                            <svg class="progress-ring w-full h-full">
+                                <circle cx="32" cy="32" r="28" stroke="rgba(102, 126, 234, 0.2)" stroke-width="4" fill="none"/>
+                                <circle id="cgpaCircle" cx="32" cy="32" r="28" stroke="url(#gradient1)" stroke-width="4" fill="none" 
+                                        class="progress-ring-circle" stroke-dasharray="176" stroke-dashoffset="176"/>
+                                <defs>
+                                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#667eea"/>
+                                        <stop offset="100%" stop-color="#764ba2"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-5xl font-extrabold gradient-text mb-2" id="displayCGPA">0.0</div>
+                    <div class="text-sm font-medium text-gray-600">Current CGPA</div>
+                    <div class="text-xs text-gray-500 mt-1">Out of 10.0</div>
+                </div>
 
-  document.getElementById('subject').value = '';
-  document.getElementById('credits').value = '';
-  render();
-}
+                <!-- Percentage Card -->
+                <div class="glass-card rounded-3xl p-6 card-3d slide-up" style="animation-delay: 0.1s">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-6xl">📈</div>
+                        <div class="text-3xl font-bold text-pink-500" id="displayPercentage">0%</div>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 mb-2">Percentage</div>
+                    <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                        <div id="percentBar" class="h-full bg-gradient-to-r from-pink-500 to-purple-600 transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
 
-function editCourse(i) {
-  const c = courses[i];
-  document.getElementById('subject').value = c.subject;
-  document.getElementById('credits').value = c.credits;
-  document.getElementById('grade').value = c.grade;
-  editIndex = i;
-}
+                <!-- Subjects Card -->
+                <div class="glass-card rounded-3xl p-6 card-3d slide-up" style="animation-delay: 0.2s">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-6xl">📚</div>
+                        <div class="text-3xl font-bold text-blue-500" id="totalSubjects">0</div>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 mb-2">Total Subjects</div>
+                    <div class="text-sm text-gray-500">Courses enrolled</div>
+                </div>
 
-function deleteCourse(i) {
-  courses.splice(i, 1);
-  render();
-}
+                <!-- Credits Card -->
+                <div class="glass-card rounded-3xl p-6 card-3d slide-up" style="animation-delay: 0.3s">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-6xl">🎯</div>
+                        <div class="text-3xl font-bold text-green-500" id="totalCredits">0</div>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900 mb-2">Total Credits</div>
+                    <div class="text-sm text-gray-500">Credits completed</div>
+                </div>
+            </div>
 
-function calculate() {
-  let totalC = 0, totalP = 0;
-  courses.forEach(c => {
-    totalC += c.credits;
-    totalP += c.credits * c.grade;
-  });
-  const cgpa = totalC ? (totalP / totalC) : 0;
-  document.getElementById('cgpa').innerText = cgpa.toFixed(2);
-  document.getElementById('percent').innerText = (cgpa * 9.5).toFixed(2) + '%';
-}
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Left Column - Input -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Add Subject Card -->
+                    <div class="gradient-border">
+                        <div class="glass-card rounded-3xl p-6">
+                            <div class="text-center mb-6">
+                                <div class="text-5xl mb-3">➕</div>
+                                <h2 class="text-2xl font-bold gradient-text mb-2">Add New Subject</h2>
+                                <p class="text-sm text-gray-500">Enter course details below</p>
+                            </div>
 
-function clearAll() {
-  courses = [];
-  render();
-  calculate();
-}
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">📝 Subject Name</label>
+                                    <input type="text" id="subjectName" placeholder="e.g., Data Structures & Algorithms"
+                                           class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:bg-white transition-all outline-none">
+                                </div>
 
-function toggleTheme() {
-  document.body.classList.toggle('dark');
-}
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">💳 Credits</label>
+                                        <input type="number" id="credits" placeholder="4" min="1" max="10"
+                                               class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:bg-white transition-all outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-2">⭐ Grade</label>
+                                        <input type="number" id="gradePoint" placeholder="9.5" min="0" max="10" step="0.1"
+                                               class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:bg-white transition-all outline-none">
+                                    </div>
+                                </div>
 
-render();
-calculate();
-</script></body>
-</html>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-2">🎯 Letter Grade</label>
+                                    <select id="letterGrade" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:bg-white transition-all outline-none">
+                                        <option value="">Auto-detect</option>
+                                        <option value="O">O - Outstanding (10)</option>
+                                        <option value="A+">A+ - Excellent (9)</option>
+                                        <option value="A">A - Very Good (8)</option>
+                                        <option value="B+">B+ - Good (7)</option>
+                                        <option value="B">B - Above Average (6)</option>
+                                        <option value="C">C - Average (5)</option>
+                                        <option value="P">P - Pass (4)</option>
+                                        <option value="F">F - Fail (0)</option>
+                                    </select>
+                                </div>
+
+                                <button onclick="addSubject()" class="btn-premium w-full text-white py-4 rounded-xl font-bold text-lg">
+                                    ✨ Add Subject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Converter -->
+                    <div class="glass-card rounded-3xl p-6">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            ⚡ Quick CGPA Converter
+                        </h3>
+                        <div class="space-y-3">
+                            <input type="number" id="quickCGPA" placeholder="Enter CGPA (0-10)" step="0.01" min="0" max="10"
+                                   class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-purple-500 outline-none">
+                            <button onclick="convertCGPA()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
+                                Convert to Percentage
+                            </button>
+                            <div class="text-center p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
+                                <div class="text-sm text-gray-600 mb-1">Result</div>
+                                <div class="text-4xl font-extrabold gradient-text" id="quickResult">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Display -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Subjects List -->
+                    <div class="glass-card rounded-3xl p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                                    📚 Your Subjects
+                                </h2>
+                                <p class="text-sm text-gray-500 mt-1" id="subjectCount">No subjects added yet</p>
+                            </div>
+                            <button onclick="sortSubjects()" class="px-4 py-2 bg-purple-100 text-purple-600 rounded-xl font-semibold hover:bg-purple-200 transition-all">
+                                Sort by Grade
+                            </button>
+                        </div>
+                        
+                        <div id="subjectsList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            <div class="text-center py-16">
+                                <div class="text-8xl mb-4 animate-bounce">📖</div>
+                                <div class="text-2xl font-bold text-gray-400 mb-2">No subjects yet</div>
+                                <div class="text-gray-400">Add your first subject to get started!</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-card rounded-3xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                🎨 Grade Distribution
+                            </h3>
+                            <canvas id="gradeChart" height="200"></canvas>
+                        </div>
+
+                        <div class="glass-card rounded-3xl p-6">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                📊 Performance Graph
+                            </h3>
+                            <canvas id="performanceChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Target Calculator -->
+                    <div class="glass-card rounded-3xl p-6 bg-gradient-to-br from-purple-50 to-pink-50">
+                        <div class="text-center mb-6">
+                            <div class="text-5xl mb-3">🎯</div>
+                            <h2 class="text-2xl font-bold gradient-text mb-2">Target CGPA Planner</h2>
+                            <p class="text-sm text-gray-600">Plan your academic goals</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Current CGPA</label>
+                                <input type="number" id="currentCGPA" step="0.01" placeholder="8.5" min="0" max="10"
+                                       class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Target CGPA</label>
+                                <input type="number" id="targetCGPA" step="0.01" placeholder="9.0" min="0" max="10"
+                                       class="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-purple-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-
